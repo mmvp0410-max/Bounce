@@ -28651,16 +28651,36 @@ gl_FragColor = blur9(uTextureSampler, vTextureCoord);
                 return this.localSeat < 0 ? !1 : super.localMove(e)
             }
             process(e) {
-                let i = e / 1e6;
-                if (i > 100 || !this.started || !this.hasServer || this.phase === 1 || this.gameOver) return;
-                this.sendPositionTimer > 0 && (this.sendPositionTimer -= i), this.respawning > 0 && (this.respawning -= i);
-                let n = this.players;
-                for (let o of n) {
-                    let a = o.bodies;
-                    for (let l of a) l.data.remaining !== void 0 && (l.data.remaining -= i)
+    let i = e / 1e6;
+    if (i > 100 || !this.started || !this.hasServer || this.phase === 1 || this.gameOver) return;
+    
+    this.sendPositionTimer > 0 && (this.sendPositionTimer -= i);
+    this.respawning > 0 && (this.respawning -= i);
+    
+    let n = this.players;
+    for (let o of n) {
+        let a = o.bodies;
+        for (let l of a) {
+            l.data.remaining !== void 0 && (l.data.remaining -= i);
+            
+            
+            if (l.data.seat === this.localSeat) {
+                
+                if (l.velocity[0] > -1) {
+                    
+                    
+                    br(this, l, [{ type: 9 }]);
+                                                           
+                    l.data.jumped = true;
+                    this.firstJump = false;
                 }
-                this.world.step(1 / 60, e / 1e9, 10)
             }
+            }
+    }
+    
+    this.world.step(1 / 60, e / 1e9, 10);
+    
+}
             startGame() {
                 !this.isObserver && this.initializedWorldWithServer && !this.gameOver || this.initializeWorld()
             }
